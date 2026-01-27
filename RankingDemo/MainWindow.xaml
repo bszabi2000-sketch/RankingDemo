@@ -1,0 +1,73 @@
+﻿<Window x:Class="RankingDemo.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:RankingDemo.Wpf.ViewModels"
+        mc:Ignorable="d"
+        Title="Ranking Demo" Height="650" Width="1000">
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <DockPanel Margin="12">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="CSV betöltése" Padding="12,6" Command="{Binding LoadCsvCommand}" />
+            <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Lekérdezés:" />
+            <ComboBox Width="420" Margin="8,0,0,0"
+              ItemsSource="{Binding Queries}"
+              SelectedItem="{Binding SelectedQuery}" />
+
+            <Button Content="Pointwise tanítás" Margin="12,0,0,0" Padding="12,6"
+            Command="{Binding TrainPointwiseCommand}" />
+            <Button Content="Pairwise tanítás" Margin="8,0,0,0" Padding="12,6"
+            Command="{Binding TrainPairwiseCommand}" />
+            <Button Content="Listwise tanítás" Margin="8,0,0,0" Padding="12,6"
+            Command="{Binding TrainListwiseCommand}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="Precision@3:" FontWeight="Bold" />
+            <TextBlock Text="{Binding PrecisionAt3, StringFormat=F2}" Margin="6,0,12,0"/>
+
+            <TextBlock Text="NDCG@3:" FontWeight="Bold" />
+            <TextBlock Text="{Binding NdcgAt3, StringFormat=F2}" Margin="6,0,0,0"/>
+        </StackPanel>
+
+
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="Eredeti lista (adatból)" Grid.Row="0" Margin="0,0,0,8">
+                <DataGrid ItemsSource="{Binding RowsForSelectedQuery}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="DocId" Binding="{Binding DocId}" Width="120"/>
+                        <DataGridTextColumn Header="Relevance" Binding="{Binding Relevance}" Width="90"/>
+                        <DataGridTextColumn Header="DocText" Binding="{Binding DocText}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+
+            <GroupBox Header="Pointwise rangsor (modell pontszám alapján)" Grid.Row="1">
+                <DataGrid ItemsSource="{Binding RankedRows}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="DocId" Binding="{Binding DocId}" Width="120"/>
+                        <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="90"/>
+                        <DataGridTextColumn Header="Relevance" Binding="{Binding Relevance}" Width="90"/>
+                        <DataGridTextColumn Header="DocText" Binding="{Binding DocText}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+        </Grid>
+    </DockPanel>
+</Window>
