@@ -12,30 +12,30 @@
     </Window.DataContext>
 
     <DockPanel Margin="12">
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
-            <Button Content="CSV betöltése" Padding="12,6" Command="{Binding LoadCsvCommand}" />
-            <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Lekérdezés:" />
-            <ComboBox Width="420" Margin="8,0,0,0"
-              ItemsSource="{Binding Queries}"
-              SelectedItem="{Binding SelectedQuery}" />
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="CSV betöltése" Padding="12,6" Command="{Binding LoadCsvCommand}" />
+                <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Lekérdezés:" />
+                <ComboBox Width="360" Margin="8,0,0,0"
+                  ItemsSource="{Binding Queries}"
+                  SelectedItem="{Binding SelectedQuery}" />
 
-            <Button Content="Pointwise tanítás" Margin="12,0,0,0" Padding="12,6"
-            Command="{Binding TrainPointwiseCommand}" />
-            <Button Content="Pairwise tanítás" Margin="8,0,0,0" Padding="12,6"
-            Command="{Binding TrainPairwiseCommand}" />
-            <Button Content="Listwise tanítás" Margin="8,0,0,0" Padding="12,6"
-            Command="{Binding TrainListwiseCommand}" />
+                <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Módszer:" />
+                <ComboBox Width="160" Margin="8,0,0,0"
+                  ItemsSource="{Binding Algorithms}"
+                  SelectedItem="{Binding SelectedAlgorithm}" />
+
+                <Button Content="Tanítás" Margin="12,0,0,0" Padding="12,6"
+                Command="{Binding TrainSelectedCommand}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <TextBlock Text="Precision@k:" FontWeight="Bold"/>
+                <TextBlock Text="{Binding PrecisionAtKValue, StringFormat=F2}" Margin="6,0,12,0"/>
+                <TextBlock Text="NDCG@k:" FontWeight="Bold"/>
+                <TextBlock Text="{Binding NdcgAtKValue, StringFormat=F2}" Margin="6,0,0,0"/>
+            </StackPanel>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-            <TextBlock Text="Precision@3:" FontWeight="Bold" />
-            <TextBlock Text="{Binding PrecisionAt3, StringFormat=F2}" Margin="6,0,12,0"/>
-
-            <TextBlock Text="NDCG@3:" FontWeight="Bold" />
-            <TextBlock Text="{Binding NdcgAt3, StringFormat=F2}" Margin="6,0,0,0"/>
-        </StackPanel>
-
-
-
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

@@ -13,7 +13,9 @@ namespace RankingDemo.Wpf.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     public sealed record RankedRow(string DocId, float Score, int Relevance, string DocText);
+    #region Propertys
 
+    
     [ObservableProperty] private ObservableCollection<string> _queries = new();
     [ObservableProperty] private string? _selectedQuery;
     [ObservableProperty] private ObservableCollection<RankedRow> _rankedRows = new();
@@ -23,6 +25,19 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<RankingRow> _rowsForSelectedQuery = new();
 
     private List<RankingRow> _allRows = new();
+
+    [ObservableProperty]
+    private ObservableCollection<RankingAlgorithm> _algorithms = new(
+    Enum.GetValues(typeof(RankingAlgorithm)).Cast<RankingAlgorithm>());
+
+    [ObservableProperty] private RankingAlgorithm _selectedAlgorithm = RankingAlgorithm.Pointwise;
+
+    [ObservableProperty] private int _k = 3;
+
+    [ObservableProperty] private float _precisionAtKValue;
+    [ObservableProperty] private float _ndcgAtKValue;
+    #endregion
+
     #region Commands
 
 
@@ -214,10 +229,53 @@ public partial class MainViewModel : ObservableObject
                 .OrderByDescending(r => model.Score(FeatureExtractor.Extract(r)))
                 .ToList(),
             k: 3);
+        }
 
-    }
+        [RelayCommand]
 
-    #endregion
+        private void TrainSelected()
+        {
+            RankedRows.Clear();
+
+            if (_allRows.Count == 0 || string.IsNullOrWhiteSpace(SelectedQuery))
+                return;
+
+            var queryId = SelectedQuery.Split('—')[0].Trim();
+            var rows = _allRows.Where(r => r.QueryId == queryId).ToList();
+            if (rows.Count < 2) return;
+
+            LinearScoringModel model = SelectedAlgorithm switch
+            {
+                RankingAlgorithm.Pointwise => PointwiseTrainer.Train(rows, epochs: 50, learningRate: 0.01f),
+                RankingAlgorithm.Pairwise => PairwiseTrainer.Train(rows, epochs: 50, learningRate: 0.01f),
+                RankingAlgorithm.Listwise => ListwiseTrainer.Train(rows, epochs: 80, learningRate: 0.02f),
+                _ => throw new NotSupportedException()
+            };
+
+            var ranked = rows
+                .Select(r =>
+                {
+                    var x = FeatureExtractor.Extract(r);
+                    var score = model.Score(x);
+                    return new RankedRow(r.DocId, score, r.Relevance, r.DocText);
+                })
+                .OrderByDescending(rr => rr.Score)
+                .ToList();
+
+            foreach (var rr in ranked)
+                RankedRows.Add(rr);
+
+
+            var rankedAsRows = ranked.Select(rr =>
+                new RankingDemo.Core.Data.RankingRow(queryId, SelectedQuery!, rr.DocId, rr.DocText, rr.Relevance)
+            ).ToList();
+
+            PrecisionAtKValue = RankingDemo.Core.Evaluation.PrecisionAtK.Compute(rankedAsRows, k: K);
+            NdcgAtKValue = RankingDemo.Core.Evaluation.Ndcg.Compute(rankedAsRows, k: K);
+        }
+        #endregion
+    
+
     partial void OnSelectedQueryChanged(string? value)
     {
         RefreshRows();
