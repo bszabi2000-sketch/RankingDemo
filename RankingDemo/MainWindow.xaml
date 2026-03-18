@@ -16,9 +16,22 @@
             <StackPanel Orientation="Horizontal">
                 <Button Content="CSV betöltése" Padding="12,6" Command="{Binding LoadCsvCommand}" />
                 <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Lekérdezés:" />
-                <ComboBox Width="360" Margin="8,0,0,0"
-                  ItemsSource="{Binding Queries}"
-                  SelectedItem="{Binding SelectedQuery}" />
+                <ComboBox Width="320"                          
+                            Margin="8,0,0,0"
+                            ItemsSource="{Binding Queries}"
+                            SelectedItem="{Binding SelectedQuery}"
+                            IsEditable="True"
+                            IsReadOnly="True"
+                            Text="{Binding SelectedQuery, TargetNullValue=Töltsön be egy .csv fájlt}"
+                            HorizontalAlignment="Center"/>
+                <TextBlock Text="k:" VerticalAlignment="Center" Margin="12,0,0,0"/>
+
+                <TextBox Width="40"
+                    Margin="8,0,0,0"
+                    Text="{Binding K}"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    TextAlignment="Center"/>
 
                 <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Módszer:" />
                 <ComboBox Width="160" Margin="8,0,0,0"
@@ -40,6 +53,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <GroupBox Header="Eredeti lista (adatból)" Grid.Row="0" Margin="0,0,0,8">
@@ -55,7 +69,7 @@
                 </DataGrid>
             </GroupBox>
 
-            <GroupBox Header="Pointwise rangsor (modell pontszám alapján)" Grid.Row="1">
+            <GroupBox Header="Kiválasztott modell rangsora" Grid.Row="1" Margin="0,0,0,8">
                 <DataGrid ItemsSource="{Binding RankedRows}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
@@ -65,6 +79,20 @@
                         <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="90"/>
                         <DataGridTextColumn Header="Relevance" Binding="{Binding Relevance}" Width="90"/>
                         <DataGridTextColumn Header="DocText" Binding="{Binding DocText}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+
+            <GroupBox Header="Módszerek összehasonlítása" Grid.Row="2">
+                <DataGrid ItemsSource="{Binding MetricResults}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  IsReadOnly="True"
+                  Height="140">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Módszer" Binding="{Binding Algorithm}" Width="*" />
+                        <DataGridTextColumn Header="Precision@k" Binding="{Binding PrecisionAtK, StringFormat=F2}" Width="120" />
+                        <DataGridTextColumn Header="NDCG@k" Binding="{Binding NdcgAtK, StringFormat=F2}" Width="120" />
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
