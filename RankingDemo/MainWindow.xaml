@@ -4,98 +4,222 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:RankingDemo.Wpf.ViewModels"
+        xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
         Title="Ranking Demo" Height="650" Width="1000">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
 
+        <Style TargetType="TextBox">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
     <Window.DataContext>
         <vm:MainViewModel />
     </Window.DataContext>
 
     <DockPanel Margin="12">
-        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
-            <StackPanel Orientation="Horizontal">
-                <Button Content="CSV betöltése" Padding="12,6" Command="{Binding LoadCsvCommand}" />
-                <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Lekérdezés:" />
-                <ComboBox Width="320"                          
-                            Margin="8,0,0,0"
-                            ItemsSource="{Binding Queries}"
-                            SelectedItem="{Binding SelectedQuery}"
-                            IsEditable="True"
-                            IsReadOnly="True"
-                            Text="{Binding SelectedQuery, TargetNullValue=Töltsön be egy .csv fájlt}"
-                            HorizontalAlignment="Center"/>
-                <TextBlock Text="k:" VerticalAlignment="Center" Margin="12,0,0,0"/>
 
-                <TextBox Width="40"
-                    Margin="8,0,0,0"
-                    Text="{Binding K}"
-                    HorizontalContentAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    TextAlignment="Center"/>
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="160"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-                <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="Módszer:" />
-                <ComboBox Width="160" Margin="8,0,0,0"
-                  ItemsSource="{Binding Algorithms}"
-                  SelectedItem="{Binding SelectedAlgorithm}" />
+            <Button Grid.Column="0"
+                Content="CSV betöltése"
+                Padding="12,6"
+                Margin="5"
+                Command="{Binding LoadCsvCommand}" />
 
-                <Button Content="Tanítás" Margin="12,0,0,0" Padding="12,6"
-                Command="{Binding TrainSelectedCommand}" />
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                <TextBlock Text="Precision@k:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding PrecisionAtKValue, StringFormat=F2}" Margin="6,0,12,0"/>
-                <TextBlock Text="NDCG@k:" FontWeight="Bold"/>
-                <TextBlock Text="{Binding NdcgAtKValue, StringFormat=F2}" Margin="6,0,0,0"/>
-            </StackPanel>
-        </StackPanel>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <GroupBox Header="Eredeti lista (adatból)" Grid.Row="0" Margin="0,0,0,8">
-                <DataGrid ItemsSource="{Binding RowsForSelectedQuery}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="DocId" Binding="{Binding DocId}" Width="120"/>
-                        <DataGridTextColumn Header="Relevance" Binding="{Binding Relevance}" Width="90"/>
-                        <DataGridTextColumn Header="DocText" Binding="{Binding DocText}" Width="*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </GroupBox>
-
-            <GroupBox Header="Kiválasztott modell rangsora" Grid.Row="1" Margin="0,0,0,8">
-                <DataGrid ItemsSource="{Binding RankedRows}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  IsReadOnly="True">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="DocId" Binding="{Binding DocId}" Width="120"/>
-                        <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="90"/>
-                        <DataGridTextColumn Header="Relevance" Binding="{Binding Relevance}" Width="90"/>
-                        <DataGridTextColumn Header="DocText" Binding="{Binding DocText}" Width="*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </GroupBox>
-
-            <GroupBox Header="Módszerek összehasonlítása" Grid.Row="2">
-                <DataGrid ItemsSource="{Binding MetricResults}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
+            <ComboBox Grid.Column="1"
+                  Margin="5"
+                  ItemsSource="{Binding Queries}"
+                  SelectedItem="{Binding SelectedQuery}"
+                  IsEditable="True"
                   IsReadOnly="True"
-                  Height="140">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Módszer" Binding="{Binding Algorithm}" Width="*" />
-                        <DataGridTextColumn Header="Precision@k" Binding="{Binding PrecisionAtK, StringFormat=F2}" Width="120" />
-                        <DataGridTextColumn Header="NDCG@k" Binding="{Binding NdcgAtK, StringFormat=F2}" Width="120" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </GroupBox>
+                  Text="{Binding SelectedQuery, TargetNullValue=Töltsön be egy .csv fájlt}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center" />
+
+            <TextBlock Grid.Column="2"
+                   Margin="5"
+                   VerticalAlignment="Center"
+                   Text="k:" />
+
+            <TextBox Grid.Column="3"
+                 Margin="5"
+                 Text="{Binding K}"
+                 VerticalContentAlignment="Center"
+                 HorizontalContentAlignment="Center" />
+
+            <TextBlock Grid.Column="4"
+                   Margin="5"
+                   VerticalAlignment="Center"
+                   Text="Módszer:" />
+
+            <ComboBox Grid.Column="5"
+                  Margin="5"
+                  ItemsSource="{Binding Algorithms}"
+                  SelectedItem="{Binding SelectedAlgorithm}"
+                  HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center" />
+
+            <Button Grid.Column="6"
+                Content="Tanítás"
+                Margin="5"
+                Padding="12,6"
+                Command="{Binding TrainSelectedCommand}" />
         </Grid>
+
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="Precision@k:" FontWeight="Bold" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding PrecisionAtKValue, StringFormat=F2}" Margin="6,0,12,0" VerticalAlignment="Center"/>
+
+            <TextBlock Text="NDCG@k:" FontWeight="Bold" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding NdcgAtKValue, StringFormat=F2}" Margin="6,0,0,0" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <TabControl>
+            <TabItem Header="Adatok">
+                <Grid Margin="8">
+                    <GroupBox Header="Eredeti lista (adatból)">
+                        <DataGrid ItemsSource="{Binding RowsForSelectedQuery}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DocId" Binding="{Binding DocId}" Width="120"/>
+                                <DataGridTextColumn Header="Relevance" Binding="{Binding Relevance}" Width="90"/>
+                                <DataGridTextColumn Header="DocText" Binding="{Binding DocText}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Rangsor">
+                <Grid Margin="8">
+                    <GroupBox Header="Kiválasztott modell rangsora">
+                        <DataGrid ItemsSource="{Binding RankedRows}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="DocId" Binding="{Binding DocId}" Width="120"/>
+                                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="90"/>
+                                <DataGridTextColumn Header="Relevance" Binding="{Binding Relevance}" Width="90"/>
+                                <DataGridTextColumn Header="DocText" Binding="{Binding DocText}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Kiértékelés">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <GroupBox Header="Módszerek összehasonlítása" Grid.Row="0" Margin="0,0,0,8">
+                        <DataGrid ItemsSource="{Binding MetricResults}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      Height="140">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Módszer" Binding="{Binding Algorithm}" Width="*"/>
+                                <DataGridTextColumn Header="Precision@k" Binding="{Binding PrecisionAtK, StringFormat=F2}" Width="120"/>
+                                <DataGridTextColumn Header="NDCG@k" Binding="{Binding NdcgAtK, StringFormat=F2}" Width="120"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+
+                    <GroupBox Header="Precision@k Vizuláció" Grid.Row="1" Margin="0,0,0,12">
+                        <ItemsControl ItemsSource="{Binding MetricResults}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="60"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                       Text="{Binding Algorithm}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0"/>
+
+                                        <ProgressBar Grid.Column="1"
+                                         Minimum="0"
+                                         Maximum="1"
+                                         Value="{Binding PrecisionAtK}"
+                                         Height="22"
+                                         VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Column="2"
+                                       Text="{Binding PrecisionAtK, StringFormat=F2}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Margin="8,0,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </GroupBox>
+
+                    <GroupBox Header="NDCG@k Vizualizáció" Grid.Row="2">
+                        <ItemsControl ItemsSource="{Binding MetricResults}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="60"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                       Text="{Binding Algorithm}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0"/>
+
+                                        <ProgressBar Grid.Column="1"
+                                         Minimum="0"
+                                         Maximum="1"
+                                         Value="{Binding NdcgAtK}"
+                                         Height="22"
+                                         VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Column="2"
+                                       Text="{Binding NdcgAtK, StringFormat=F2}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       Margin="8,0,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </DockPanel>
 </Window>

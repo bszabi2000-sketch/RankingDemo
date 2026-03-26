@@ -20,5 +20,6 @@ namespace RankingDemo.Wpf
         {
             InitializeComponent();
         }
+
     }
 }

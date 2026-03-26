@@ -8,13 +8,17 @@ using System.Collections.ObjectModel;
 using RankingDemo.Core.Evaluation;
 
 
+
+
 namespace RankingDemo.Wpf.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
     public sealed record RankedRow(string DocId, float Score, int Relevance, string DocText);
     public sealed record MetricResultRow(string Algorithm, float PrecisionAtK, float NdcgAtK);
+
     #region Propertys
+
 
     [ObservableProperty] private ObservableCollection<MetricResultRow> _metricResults = new();
     [ObservableProperty] private ObservableCollection<string> _queries = new();
@@ -118,7 +122,11 @@ public partial class MainViewModel : ObservableObject
             MetricResults.Add(EvaluateAlgorithm("Pointwise", pointwiseModel, rows, queryId));
             MetricResults.Add(EvaluateAlgorithm("Pairwise", pairwiseModel, rows, queryId));
             MetricResults.Add(EvaluateAlgorithm("Listwise", listwiseModel, rows, queryId));
+
+         
+            
         }
+
         #endregion
     
 
