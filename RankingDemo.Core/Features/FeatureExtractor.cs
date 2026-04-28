@@ -9,35 +9,67 @@ public static class FeatureExtractor
     {
         var qTokens = Tokenize(row.QueryText);
         var dTokens = Tokenize(row.DocText);
+        var hasStructuredStats =
+            row.Points.HasValue ||
+            row.GoalDifference.HasValue ||
+            row.Wins.HasValue ||
+            row.GoalsFor.HasValue ||
+            row.GoalsAgainst.HasValue;
 
-        if (qTokens.Count == 0)
-            return new float[] { 0f, LogLen(row.DocText), 0f };
+        float hits = 0f;
+        float coverage = 0f;
 
-        int hits = 0;
-        int covered = 0;
-
-        var dSet = new HashSet<string>(dTokens);
-
-        foreach (var qt in qTokens)
+        if (qTokens.Count > 0)
         {
-            if (dSet.Contains(qt)) covered++;
+            int covered = 0;
+            var dSet = new HashSet<string>(dTokens);
+
+            foreach (var qt in qTokens)
+            {
+                if (dSet.Contains(qt))
+                {
+                    covered++;
+                }
+            }
+
+            var qSet = new HashSet<string>(qTokens);
+            foreach (var dt in dTokens)
+            {
+                if (qSet.Contains(dt))
+                {
+                    hits++;
+                }
+            }
+
+            coverage = (float)covered / qSet.Count;
         }
 
-
-        var qSet = new HashSet<string>(qTokens);
-        foreach (var dt in dTokens)
-        {
-            if (qSet.Contains(dt)) hits++;
-        }
-
-        float coverage = (float)covered / qSet.Count;
-
-        return new float[]
-        {
-            hits,
+        return
+        [
+            Normalize(row.Points, 100f, hasStructuredStats),
+            Normalize(row.GoalDifference, 50f, hasStructuredStats),
+            Normalize(row.Wins, 38f, hasStructuredStats),
+            Normalize(row.GoalsFor, 100f, hasStructuredStats),
+            NormalizeNegative(row.GoalsAgainst, 100f, hasStructuredStats),
+            hits / 20f,
             LogLen(row.DocText),
             coverage
-        };
+        ];
+    }
+
+    private static float Normalize(int? value, float scale, bool enabled)
+    {
+        if (!enabled || !value.HasValue)
+        {
+            return 0f;
+        }
+
+        return value.Value / scale;
+    }
+
+    private static float NormalizeNegative(int? value, float scale, bool enabled)
+    {
+        return -Normalize(value, scale, enabled);
     }
 
     private static float LogLen(string text)
